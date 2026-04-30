@@ -1,34 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Confetti from 'react-confetti';
 
 const projects = [
   {
+    id: 4,
+    title: "MSP Security & Compliance Platform UI",
+    description: "Frontend UI for a platform that unifies IT operations, compliance tracking, and network visibility into a single system.",
+    tags: ["React", "TypeScript", "UI/UX", "Data Visualization"],
+    live: "#",
+    highlight: "Walkthrough available",
+  },
+  {
+    id: 5,
+    title: "Screen Art — Multi-Device Interactive Platform",
+    description: "Real-time multi-device application connecting TV and mobile interfaces for collaborative, QR-driven user interaction.",
+    tags: ["React", "WebSockets", "QR Codes", "Real-time UI"],
+    live: "https://screen-art-io6w.vercel.app/",
+    highlight: "Codebase: Private",
+  },
+  {
     id: 1,
-    title: "Pizza POS System",
-    description:
-      "Full-stack point-of-sale application featuring four distinct real-time interfaces: Customer ordering, Kitchen display, Register checkout, and Manager monitor. Architected to simulate the command-and-control environments built for hospital networks.",
+    title: "Pizza POS — Full Stack Ordering System",
+    description: "Full stack ordering system with structured UI workflows, state management, and user interaction handling.",
     tags: ["Next.js 14", "React", "Prisma", "Tailwind CSS", "PostgreSQL"],
     live: "https://pizza-web-ui.vercel.app/",
     highlight: "4 real-time interfaces",
   },
   {
-    id: 2,
-    title: "react_ui_showcase",
-    description:
-      "A collection of frontend builds demonstrating progression from foundational UI components to full application builds. Covers modern React patterns, responsive layouts, and API integration.",
-    tags: ["React", "JavaScript", "CSS", "REST APIs"],
-    live: "https://don-w-internship.vercel.app/",
-    highlight: "Full internship track",
-  },
-  {
     id: 3,
-    title: "Nike E-Commerce Store",
-    description:
-      "A high-fidelity e-commerce storefront inspired by Nike's design language. Features product browsing, filtering, cart management, and a checkout flow — built with performance and clean UX as the primary constraints.",
+    title: "Nike Store — E-Commerce Frontend",
+    description: "Responsive storefront UI focused on layout, product display, and clean user experience patterns.",
     tags: ["Next.js", "React", "Tailwind CSS", "TypeScript"],
     live: "https://ecommerce-nike-mu.vercel.app/",
     highlight: "Full cart & checkout flow",
+  },
+  {
+    id: 2,
+    title: "React UI Showcase — Component Library",
+    description: "Reusable component patterns demonstrating layout, styling, and interactive UI behavior.",
+    tags: ["React", "JavaScript", "CSS", "REST APIs"],
+    live: "https://don-w-internship.vercel.app/",
+    highlight: "Full internship track",
   },
 ];
 
@@ -40,10 +54,36 @@ const skills = [
 ];
 
 function ContactModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [form, setForm] = useState({ email: "", subject: "", message: "" });
+  const [form, setForm] = useState({ email: "", subject: "", message: "", cc: "" });
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [showBalloon, setShowBalloon] = useState(false);
+
+  useEffect(() => {
+    if (sent) {
+      setShowBalloon(true);
+      // Balloon rises for 2s, then pops
+      const popTimeout = setTimeout(() => {
+        setShowBalloon(false);
+        setShowConfetti(true);
+      }, 2000);
+
+      // Confetti runs for 5s, then everything resets
+      const confettiTimeout = setTimeout(() => {
+        setShowConfetti(false);
+        setSent(false);
+        onClose();
+        setForm({ email: "", subject: "", message: "", cc: "" });
+      }, 7000);
+
+      return () => {
+        clearTimeout(popTimeout);
+        clearTimeout(confettiTimeout);
+      };
+    }
+  }, [sent, onClose]);
 
   const handleSubmit = async () => {
     if (!form.email || !form.message) {
@@ -56,15 +96,10 @@ function ContactModal({ open, onClose }: { open: boolean; onClose: () => void })
       const res = await fetch("https://formspree.io/f/xvzwpjjo", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({ email: form.email, subject: form.subject, message: form.message }),
+        body: JSON.stringify({ email: form.email, cc: form.cc, subject: form.subject, message: form.message }),
       });
       if (res.ok) {
         setSent(true);
-        setTimeout(() => {
-          setSent(false);
-          onClose();
-          setForm({ email: "", subject: "", message: "" });
-        }, 3000);
       } else {
         setError("Something went wrong. Please try again.");
       }
@@ -88,10 +123,13 @@ function ContactModal({ open, onClose }: { open: boolean; onClose: () => void })
           from { opacity: 0; transform: translateY(32px) scale(0.96); }
           to   { opacity: 1; transform: translateY(0) scale(1); }
         }
-        @keyframes checkPop {
-          0%   { transform: scale(0); opacity: 0; }
-          70%  { transform: scale(1.15); }
-          100% { transform: scale(1); opacity: 1; }
+        @keyframes balloonRise {
+          from { transform: translateY(100vh) scale(0.8); opacity: 0; }
+          to   { transform: translateY(50vh) scale(1); opacity: 1; }
+        }
+        @keyframes balloonPop {
+          from { transform: translateY(50vh) scale(1); opacity: 1; }
+          to   { transform: translateY(50vh) scale(1.2); opacity: 0; }
         }
         .modal-input:focus {
           border-color: #2e6da4 !important;
@@ -99,97 +137,108 @@ function ContactModal({ open, onClose }: { open: boolean; onClose: () => void })
         }
       `}</style>
 
+      {showConfetti && <Confetti recycle={false} numberOfPieces={200} />}
+
       {/* Backdrop */}
       <div
         onClick={onClose}
         style={{
           position: "fixed", inset: 0, zIndex: 100,
-          background: "rgba(10,20,40,0.45)",
-          backdropFilter: "blur(6px)",
+          background: sent ? "rgba(10,20,40,0.0)" : "rgba(10,20,40,0.45)",
+          backdropFilter: sent ? "blur(0px)" : "blur(6px)",
           display: "flex", alignItems: "center", justifyContent: "center",
           padding: 24,
           animation: "fadeInOverlay 0.25s ease forwards",
+          transition: "background .5s, backdrop-filter .5s",
         }}
       >
+        {showBalloon && (
+          <div style={{
+            position: "absolute",
+            bottom: 0,
+            left: "50%",
+            transform: "translateX(-50%)",
+            animation: `balloonRise 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
+          }}>
+            <div style={{
+              width: 75,
+              height: 90,
+              background: "#ef4444",
+              borderRadius: "50% 50% 50% 50% / 60% 60% 40% 40%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontFamily: "'Comic Sans MS', cursive, sans-serif",
+              fontSize: "14px",
+              fontWeight: "bold",
+              position: "relative",
+            }}>
+              USPS
+              <div style={{ position: "absolute", bottom: -5, left: "calc(50% - 2.5px)", width: 5, height: 5, background: "#ef4444", borderRadius: "50%" }} />
+            </div>
+            <div style={{ position: "absolute", top: 90, left: "calc(50% - 1px)", width: 2, height: 50, background: "#a1a1aa" }} />
+            <div style={{ position: "absolute", top: 140, left: "calc(50% - 15px)", width: 30, height: 20, background: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: 2 }}>
+              <div style={{ position: "absolute", top: 2, right: 2, width: 6, height: 6, background: "#fbbf24", borderRadius: "50%" }} />
+            </div>
+          </div>
+        )}
+
         {/* Modal card */}
         <div
           onClick={(e) => e.stopPropagation()}
           style={{
             background: "#fff",
             borderRadius: 20,
-            padding: sent ? "56px 40px" : "40px 40px 36px",
+            padding: "40px 40px 36px",
             width: "100%",
             maxWidth: 480,
             boxShadow: "0 32px 80px rgba(0,0,0,0.18), 0 4px 24px rgba(0,0,0,0.08)",
             animation: "slideUpModal 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards",
             position: "relative",
-            transition: "padding 0.3s ease",
+            transition: "opacity 1s ease, transform 1s ease",
+            opacity: sent ? 0 : 1,
+            transform: sent ? "scale(0.95)" : "scale(1)",
+            pointerEvents: sent ? "none" : "auto",
           }}
         >
-          {/* Close */}
-          {!sent && (
-            <button
-              onClick={onClose}
-              style={{
-                position: "absolute", top: 14, right: 14,
-                background: "none", border: "none", cursor: "pointer",
-                color: "#a8a8a4", fontSize: 18, lineHeight: 1,
-                width: 32, height: 32, borderRadius: 8,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                transition: "background 0.15s, color 0.15s",
-                fontFamily: "inherit",
-              }}
-              onMouseOver={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "#f4f4f2";
-                (e.currentTarget as HTMLButtonElement).style.color = "#1a1a18";
-              }}
-              onMouseOut={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "none";
-                (e.currentTarget as HTMLButtonElement).style.color = "#a8a8a4";
-              }}
-            >✕</button>
-          )}
-
-          {sent ? (
-            <div style={{ textAlign: "center" }}>
-              <div style={{
-                width: 64, height: 64, borderRadius: "50%",
-                background: "#eff6ff", border: "2px solid #bfdbfe",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                margin: "0 auto 20px",
-                animation: "checkPop 0.4s cubic-bezier(0.16,1,0.3,1) forwards",
-              }}>
-                <span style={{ fontSize: 28 }}>✉️</span>
-              </div>
-              <h3 style={{ fontSize: 20, fontWeight: 600, color: "#1a2e4a", marginBottom: 8 }}>
-                Message sent!
-              </h3>
-              <p style={{ fontSize: 14, color: "#6b6b67" }}>
-                Thanks for reaching out — I&apos;ll get back to you soon!
-              </p>
-            </div>
-          ) : (
             <>
+              <button
+                onClick={onClose}
+                style={{
+                  position: "absolute", top: 14, right: 14,
+                  background: "none", border: "none", cursor: "pointer",
+                  color: "#a8a8a4", fontSize: 18, lineHeight: 1,
+                  width: 32, height: 32, borderRadius: 8,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "background 0.15s, color 0.15s",
+                  fontFamily: "inherit",
+                }}
+                onMouseOver={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.background = "#f4f4f2";
+                  (e.currentTarget as HTMLButtonElement).style.color = "#1a1a18";
+                }}
+                onMouseOut={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.background = "none";
+                  (e.currentTarget as HTMLButtonElement).style.color = "#a8a8a4";
+                }}
+              >✕</button>
               <div style={{ marginBottom: 28 }}>
                 <p style={{
                   fontSize: 11, fontWeight: 600, color: "#2e6da4",
                   textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6,
-                }}>Get In Touch</p>
-                <h3 style={{
-                  fontSize: 22, fontWeight: 600, color: "#1a2e4a",
-                  letterSpacing: "-0.01em", marginBottom: 8, lineHeight: 1.3,
-                }}>
-                  Let&apos;s build the future together.
-                </h3>
+                }}>Discuss a Project</p>
                 <p style={{ fontSize: 14, color: "#6b6b67", lineHeight: 1.65 }}>
-                  I can&apos;t wait to hear from you. Drop me a message and I&apos;ll
-                  get back to you as soon as possible.
+                  If you’re working on a dashboard, internal tool, or frontend project and need help building or improving it, feel free to reach out.
+                  <br/><br/>
+                  Available for part-time or contract work.
                 </p>
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {[
                   { key: "email", label: "Your Email", type: "email", placeholder: "you@example.com" },
+                  { key: "cc", label: "CC", type: "email", placeholder: "add others to the conversation" },
                   { key: "subject", label: "Subject", type: "text", placeholder: "What's this about?" },
                 ].map(({ key, label, type, placeholder }) => (
                   <div key={key}>
@@ -262,8 +311,7 @@ function ContactModal({ open, onClose }: { open: boolean; onClose: () => void })
                 </button>
               </div>
             </>
-          )}
-        </div>
+          </div>
       </div>
     </>
   );
@@ -329,9 +377,10 @@ export default function Home() {
             fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 600, lineHeight: 1.15,
             color: "var(--text-primary)", letterSpacing: "-0.02em", marginBottom: 20,
           }}>
-            Full-Stack Engineer.<br />
+            Frontend Developer for Business-Critical Interfaces.<br />
             <span style={{ color: "var(--text-secondary)", fontWeight: 400 }}>
-              20 years of building systems<br />that don&apos;t fail.
+              Former MCSE systems engineer building modern web applications with a focus on reliability, 
+              clarity, and real-world operations.
             </span>
           </h1>
 
@@ -339,9 +388,8 @@ export default function Home() {
             fontSize: 17, color: "var(--text-secondary)",
             maxWidth: 560, lineHeight: 1.7, marginBottom: 32,
           }}>
-            Infrastructure specialist turned full-stack developer. I spent two decades keeping
-            banking and healthcare systems alive — now I build modern web applications with
-            the same discipline: tested, documented, and ready for scale.
+            I design and build frontend interfaces for dashboards, internal tools, and operational
+             systems — where performance, usability, and accuracy matter.
           </p>
 
           <div className="fade-up fade-up-4" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
