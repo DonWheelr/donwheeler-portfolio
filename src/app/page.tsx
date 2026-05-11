@@ -85,10 +85,10 @@ const projects = [
 ];
 
 const skills = [
-  { category: "Frontend", items: ["Next.js 14", "React", "TypeScript", "Tailwind CSS"] },
-  { category: "Backend", items: ["Node.js", "Prisma", "PostgreSQL", "REST APIs"] },
+  { category: "Frontend", items: ["Next.js 14", "React", "TypeScript", "JavaScript", "Tailwind CSS", "Stripe", "WebSockets"] },
+  { category: "Backend", items: ["Prisma", "PostgreSQL", "REST APIs"] },
   { category: "Infrastructure", items: ["PowerShell", "VBScript", "Network Automation", "Cisco"] },
-  { category: "Practices", items: ["3-2-1 Backup", "DR Testing", "Documentation", "AI-Assisted Dev"] },
+  { category: "Practices", items: ["Systems Reliability", "Incident Response", "Documentation", "AI-Assisted Dev"] },
 ];
 
 const CLOSE_DURATION_MS = 280;
