@@ -4,6 +4,34 @@ import { useEffect, useRef, useState } from "react";
 
 const projects = [
   {
+    id: 6,
+    title: "Skinstric — AI Skincare Diagnostic Platform",
+    description:
+      "A ground-up build of a Figma design for an AI-powered skincare brand. Implemented a minimalist aesthetic using utility-first Tailwind CSS and engineered custom Camera API permission handling to gracefully guide users through browser security dialogs.",
+    tags: ["Next.js", "React", "Tailwind CSS", "TypeScript", "Camera API"],
+    live: "https://skinstric-omega-ebon.vercel.app/",
+    highlight: "Figma-to-Code",
+    caseStudy: {
+      challenge: "Build a 1:1 identical clone of a Figma design for an AI skincare brand with zero starter code.",
+      technicalWin: "Used a utility-first Tailwind CSS approach to lock in a minimalist aesthetic without the overhead of heavy frameworks.",
+      seniorMoment: "Identified a silent failure in the camera diagnostic tool on certain browsers. I engineered a custom error-handling flow that guided users to fix their own permissions, preventing user drop-off.",
+    },
+  },
+  {
+    id: 7,
+    title: "Belmont Terrace — Community Water Utility Site",
+    description:
+      "Full utility management site for an 87-home member-owned water cooperative in Sebastopol, CA. Covers bill payment, a compliance document archive, system status, and a community calendar.",
+    tags: ["Next.js", "React", "Tailwind CSS", "Stripe", "TypeScript"],
+    live: "https://belmont-terrace.vercel.app/",
+    highlight: "Real client · Pending rollout",
+    caseStudy: {
+      challenge: "Build a complete digital presence for a member-owned water utility with no existing site — covering regulatory compliance documents, bill payment, and community communications.",
+      technicalWin: "Integrated Stripe for bill payment and built a category-based document archive organizing regulatory materials (bylaws, consumer confidence reports, financial statements, meeting minutes) into a clean, filterable structure.",
+      seniorMoment: "Recognized early that a regulated utility has strict public records obligations. Rather than a generic file dump, I architected the document system around compliance categories — so members can find required disclosures quickly and the board stays audit-ready.",
+    },
+  },
+  {
     id: 4,
     title: "MSP Security & Compliance Platform UI",
     description:
@@ -11,9 +39,12 @@ const projects = [
     tags: ["React", "TypeScript", "UI/UX", "Data Visualization"],
     live: "",
     highlight: "Private repo",
-    ctaLabel: "Request Demo",
+    ctaLabel: "Ask About This Project",
     privateDemo: true,
-    demoNote: "Dockerized demo environment available for hiring walkthroughs.",
+    videos: [
+      { src: "/screenshots/monitor.mp4", label: "Monitor Dashboard" },
+      { src: "/screenshots/tech.mp4", label: "Tech Overview" },
+    ],
   },
   {
     id: 5,
@@ -526,18 +557,20 @@ function ContactModal({ open, onClose }: { open: boolean; onClose: () => void })
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [expandedCaseStudy, setExpandedCaseStudy] = useState<number | null>(null);
+  const [expandedVideo, setExpandedVideo] = useState<number | null>(null);
+  const [loadedVideos, setLoadedVideos] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const seededTheme = document.documentElement.dataset.theme;
     const savedTheme = window.localStorage.getItem("portfolio-theme");
-    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     const nextTheme =
       seededTheme === "dark" || seededTheme === "light"
         ? seededTheme
         : savedTheme === "dark" || savedTheme === "light"
           ? savedTheme
-          : systemTheme;
+          : "dark";
 
     setTheme(nextTheme);
   }, []);
@@ -713,7 +746,7 @@ export default function Home() {
               View Projects
             </a>
             <a
-              href="https://github.com/slowheelerfam-netizen"
+              href="https://github.com/DonWheelr"
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -772,118 +805,278 @@ export default function Home() {
               <div
                 key={project.id}
                 className={`fade-up fade-up-${i + 2}`}
-                style={{
-                  background: "var(--bg-card)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 12,
-                  padding: "28px 32px",
-                  transition: "border-color 0.2s, box-shadow 0.2s",
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.borderColor = "var(--accent-border)";
-                  e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.06)";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.borderColor = "var(--border)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
               >
                 <div
                   style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    gap: 16,
-                    flexWrap: "wrap",
-                    marginBottom: 12,
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 12,
+                    padding: "28px 32px",
+                    transition: "border-color 0.2s, box-shadow 0.2s",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = "var(--accent-border)";
+                    e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.06)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = "var(--border)";
+                    e.currentTarget.style.boxShadow = "none";
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                    <h3
-                      style={{
-                        fontSize: 17,
-                        fontWeight: 600,
-                        color: "var(--text-primary)",
-                        fontFamily: project.title.includes("_") ? "DM Mono, monospace" : "inherit",
-                      }}
-                    >
-                      {project.title}
-                    </h3>
-                    <span
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 500,
-                        color: "var(--green)",
-                        background: "var(--success-bg)",
-                        border: "1px solid var(--success-border)",
-                        borderRadius: 999,
-                        padding: "2px 8px",
-                      }}
-                    >
-                      {project.highlight}
-                    </span>
-                    {"demoNote" in project ? (
-                      <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{project.demoNote}</span>
-                    ) : null}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      gap: 16,
+                      flexWrap: "wrap",
+                      marginBottom: 12,
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                      <h3
+                        style={{
+                          fontSize: 17,
+                          fontWeight: 600,
+                          color: "var(--text-primary)",
+                          fontFamily: project.title.includes("_") ? "DM Mono, monospace" : "inherit",
+                        }}
+                      >
+                        {project.title}
+                      </h3>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 500,
+                          color: "var(--green)",
+                          background: "var(--success-bg)",
+                          border: "1px solid var(--success-border)",
+                          borderRadius: 999,
+                          padding: "2px 8px",
+                        }}
+                      >
+                        {project.highlight}
+                      </span>
+                    </div>
+                    {"caseStudy" in project ? (
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                        {project.live ? (
+                          <a
+                            href={project.live}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              fontSize: 13,
+                              color: "var(--accent)",
+                              fontWeight: 500,
+                              textDecoration: "none",
+                              border: "1px solid var(--accent-border)",
+                              borderRadius: 6,
+                              padding: "5px 12px",
+                              background: "var(--accent-light)",
+                            }}
+                          >
+                            Live Demo ↗
+                          </a>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={() => setExpandedCaseStudy(expandedCaseStudy === project.id ? null : project.id)}
+                          style={{
+                            fontSize: 13,
+                            color: "var(--accent)",
+                            fontWeight: 500,
+                            border: "1px solid var(--accent-border)",
+                            borderRadius: 6,
+                            padding: "5px 12px",
+                            background: expandedCaseStudy === project.id ? "var(--accent-light)" : "transparent",
+                            cursor: "pointer",
+                            fontFamily: "DM Sans, sans-serif",
+                            transition: "background 0.15s, border-color 0.15s",
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.background = "var(--accent-light)";
+                            e.currentTarget.style.borderColor = "var(--accent)";
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.background = expandedCaseStudy === project.id ? "var(--accent-light)" : "transparent";
+                            e.currentTarget.style.borderColor = "var(--accent-border)";
+                          }}
+                        >
+                          {expandedCaseStudy === project.id ? "Hide Case Study" : "Case Study"}
+                        </button>
+                      </div>
+                    ) : project.privateDemo ? (
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                        {"videos" in project && project.videos ? (
+                          <button
+                            type="button"
+                            onClick={() => setExpandedVideo(expandedVideo === project.id ? null : project.id)}
+                            style={{
+                              fontSize: 13,
+                              color: "var(--accent)",
+                              fontWeight: 500,
+                              border: "1px solid var(--accent-border)",
+                              borderRadius: 6,
+                              padding: "5px 12px",
+                              background: expandedVideo === project.id ? "var(--accent-light)" : "transparent",
+                              cursor: "pointer",
+                              fontFamily: "DM Sans, sans-serif",
+                              transition: "background 0.15s, border-color 0.15s",
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.background = "var(--accent-light)";
+                              e.currentTarget.style.borderColor = "var(--accent)";
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.background = expandedVideo === project.id ? "var(--accent-light)" : "transparent";
+                              e.currentTarget.style.borderColor = "var(--accent-border)";
+                            }}
+                          >
+                            {expandedVideo === project.id ? "Hide Video" : "Watch Video ▶"}
+                          </button>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={() => setModalOpen(true)}
+                          style={{
+                            fontSize: 13,
+                            color: "var(--accent)",
+                            fontWeight: 500,
+                            border: "1px solid var(--accent-border)",
+                            borderRadius: 6,
+                            padding: "5px 12px",
+                            background: "var(--accent-light)",
+                            cursor: "pointer",
+                            fontFamily: "DM Sans, sans-serif",
+                          }}
+                        >
+                          {project.ctaLabel}
+                        </button>
+                      </div>
+                    ) : (
+                      <a
+                        href={project.live}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          fontSize: 13,
+                          color: "var(--accent)",
+                          fontWeight: 500,
+                          textDecoration: "none",
+                          border: "1px solid var(--accent-border)",
+                          borderRadius: 6,
+                          padding: "5px 12px",
+                          background: "var(--accent-light)",
+                        }}
+                      >
+                        Live Demo ↗
+                      </a>
+                    )}
                   </div>
-                  {project.privateDemo ? (
-                    <button
-                      type="button"
-                      onClick={() => setModalOpen(true)}
-                      style={{
-                        fontSize: 13,
-                        color: "var(--accent)",
-                        fontWeight: 500,
-                        border: "1px solid var(--accent-border)",
-                        borderRadius: 6,
-                        padding: "5px 12px",
-                        background: "var(--accent-light)",
-                        cursor: "pointer",
-                        fontFamily: "DM Sans, sans-serif",
-                      }}
-                    >
-                      {project.ctaLabel}
-                    </button>
-                  ) : (
-                    <a
-                      href={project.live}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        fontSize: 13,
-                        color: "var(--accent)",
-                        fontWeight: 500,
-                        textDecoration: "none",
-                        border: "1px solid var(--accent-border)",
-                        borderRadius: 6,
-                        padding: "5px 12px",
-                        background: "var(--accent-light)",
-                      }}
-                    >
-                      Live Demo ↗
-                    </a>
-                  )}
+                  <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.65, marginBottom: 16 }}>
+                    {project.description}
+                  </p>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {project.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        style={{
+                          fontSize: 12,
+                          color: "var(--tag-text)",
+                          background: "var(--tag-bg)",
+                          borderRadius: 5,
+                          padding: "3px 9px",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  {"videos" in project && project.videos && expandedVideo === project.id ? (
+                    <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 16, animation: "fadeIn 0.2s ease" }}>
+                      {project.videos.map(({ src, label }) => (
+                        <div key={src}>
+                          <p style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+                            {label}
+                          </p>
+                          <div style={{ position: "relative", borderRadius: 8, overflow: "hidden", border: "1px solid var(--border)" }}>
+                            {!loadedVideos.has(src) ? (
+                              <div style={{
+                                position: "absolute",
+                                inset: 0,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                background: "var(--tag-bg)",
+                                minHeight: 120,
+                              }}>
+                                <span style={{ fontSize: 13, color: "var(--text-muted)" }}>Loading…</span>
+                              </div>
+                            ) : null}
+                            <video
+                              src={src}
+                              autoPlay
+                              muted
+                              loop
+                              playsInline
+                              onCanPlay={() => setLoadedVideos((prev) => new Set(prev).add(src))}
+                              style={{
+                                width: "100%",
+                                display: "block",
+                                opacity: loadedVideos.has(src) ? 1 : 0,
+                                transition: "opacity 0.3s ease",
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
-                <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.65, marginBottom: 16 }}>
-                  {project.description}
-                </p>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      style={{
-                        fontSize: 12,
-                        color: "var(--tag-text)",
-                        background: "var(--tag-bg)",
-                        borderRadius: 5,
-                        padding: "3px 9px",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+
+                {"caseStudy" in project && expandedCaseStudy === project.id ? (
+                  <div
+                    style={{
+                      background: "var(--bg-card)",
+                      border: "1px solid var(--border)",
+                      borderTop: "none",
+                      borderRadius: "0 0 12px 12px",
+                      padding: "28px 32px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 24,
+                      animation: "fadeIn 0.2s ease",
+                    }}
+                  >
+                    <div>
+                      <p style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+                        The Challenge
+                      </p>
+                      <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.7 }}>
+                        {project.caseStudy?.challenge}
+                      </p>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+                        The Technical Win
+                      </p>
+                      <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.7 }}>
+                        {project.caseStudy?.technicalWin}
+                      </p>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+                        The Senior Moment
+                      </p>
+                      <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.7 }}>
+                        {project.caseStudy?.seniorMoment}
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
               </div>
             ))}
           </div>
@@ -995,22 +1188,21 @@ export default function Home() {
             >
               Background
             </p>
-            <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.7 }}>
-              Twenty years managing the digital infrastructure of banks and hospitals taught me one
-              thing: systems must be{" "}
+            <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 16 }}>
               <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
-                reliable before they are clever
-              </strong>
-              . I bring that discipline to every line of code whether it&apos;s a PowerShell
-              automation script for 5,000 remote devices or a React component that handles edge
-              cases gracefully.
+                Eighteen years managing IT infrastructure for banks and hospitals shaped how I think about code.
+              </strong>{" "}
+              When you've debugged permission cascades across 5,000 remote devices or traced a cascade failure through a hospital network, you learn that user experience isn't just about beauty—it's about <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>resilience.</strong>
+            </p>
+            <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.7 }}>
+              That discipline carries into every React component and TypeScript type I write. I anticipate where apps break (browser permissions, stale state, edge cases), and I engineer solutions before users hit the error page. I understand network pipes, latency, hardware conflicts, and permission logic—the "boring infrastructure stuff" that actually keeps users engaged. To me, a production-ready application isn't impressive until it <em style={{ color: "var(--text-primary)" }}>fails gracefully.</em>
             </p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 14, flexShrink: 0 }}>
             {[
-              { label: "Years Experience", value: "20+" },
-              { label: "Industries", value: "Banking · Healthcare" },
-              { label: "Stack", value: "Next.js · React · Node" },
+              { label: "Years Experience", value: "20+ (Infrastructure)" },
+              { label: "Industries", value: "Banking · Healthcare · SaaS" },
+              { label: "Core Philosophy", value: "Reliable Before Clever" },
             ].map(({ label, value }) => (
               <div key={label}>
                 <p style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 2 }}>{label}</p>
@@ -1074,7 +1266,7 @@ export default function Home() {
               Send a Message
             </button>
             <a
-              href="https://github.com/slowheelerfam-netizen"
+              href="https://github.com/DonWheelr"
               target="_blank"
               rel="noopener noreferrer"
               style={{
